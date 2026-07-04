@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zin Zin Motor - Tool Cập Nhật Mô Tả Shopee</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-6 border-b border-slate-200 pb-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    🏎️ ZIN ZIN MOTOR
+                </h1>
+                <p class="text-sm text-slate-500">Công cụ tự động hóa chuẩn hóa mô tả sản phẩm Thương mại điện tử</p>
+            </div>
+            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Trạng thái: Sẵn sàng</span>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
+                    <h2 class="text-lg font-semibold text-slate-900 border-b pb-2">1. Thông Tin Chuyên Biệt (Từ Google Sheets)</h2>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-sm font-medium text-slate-700">Tên sản phẩm</label>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="insertToken('[the_ten_san_pham]')" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 font-medium flex items-center gap-0.5 cursor-pointer" title="Chèn thẻ vào vị trí con trỏ trong khuôn mẫu">📋 Chèn thẻ</button>
+                                <button onclick="clearField('input_ten')" class="text-xs bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 px-2 py-1 rounded font-medium cursor-pointer">✕ Xóa</button>
+                            </div>
+                        </div>
+                        <input type="text" id="input_ten" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="VD: Dàn Áo SH 150i /125i 2017...">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-sm font-medium text-slate-700">Đời xe</label>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="insertToken('[the_doi_xe]')" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 font-medium flex items-center gap-0.5 cursor-pointer" title="Chèn thẻ vào vị trí con trỏ trong khuôn mẫu">🛵 Chèn thẻ</button>
+                                <button onclick="clearField('input_doi')" class="text-xs bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 px-2 py-1 rounded font-medium cursor-pointer">✕ Xóa</button>
+                            </div>
+                        </div>
+                        <input type="text" id="input_doi" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="VD: SH 125i/150i 2017-2019">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-sm font-medium text-slate-700">Dữ liệu Mã Sản Phẩm (Bảng tính Sheets)</label>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="insertToken('[the_ma_san_pham]')" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 font-medium flex items-center gap-0.5 cursor-pointer" title="Chèn thẻ vào vị trí con trỏ trong khuôn mẫu">🔢 Chèn thẻ</button>
+                                <button onclick="clearField('input_ma_raw')" class="text-xs bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-600 px-2 py-1 rounded font-medium cursor-pointer">✕ Xóa bảng dữ liệu cũ</button>
+                            </div>
+                        </div>
+                        
+                        <textarea id="input_ma_raw" rows="3" class="w-full border border-slate-300 rounded-lg p-2 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Click vào đây và nhấn Ctrl+V để dán trực tiếp vùng chọn từ Google Sheets..."></textarea>
+                        
+                        <div id="sheet_table_view" class="mt-2 hidden">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-b border-slate-100 pb-2">
+                        <h2 class="text-lg font-semibold text-slate-900">2. Khuôn Mô Tả Thô (Template)</h2>
+                        <div class="flex items-center gap-4">
+                            <label class="inline-flex items-center cursor-pointer text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                                <input type="checkbox" id="chk_fix_spacing" checked class="sr-only peer" onchange="processData()">
+                                <div class="relative w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-600"></div>
+                                <span class="ms-2 select-none">Tự sửa lỗi giãn dòng Shopee</span>
+                            </label>
+                            <button onclick="loadSampleTemplate()" class="text-xs text-blue-600 hover:underline cursor-pointer font-medium">Tải khuôn mẫu ví dụ</button>
+                        </div>
+                    </div>
+
+                    <textarea id="template_area" rows="10" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-sans" placeholder="Nhập khuôn bài viết gốc của bạn ở đây..."></textarea>
+                </div>
+            </div>
+
+            <div class="flex flex-col h-full">
+                <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 flex flex-col flex-grow space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <h2 class="text-lg font-semibold text-slate-900">3. Kết Quả Xem Trước & Copy</h2>
+                        <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-1 shadow-sm cursor-pointer">
+                            📋 Sao chép toàn bộ mô tả
+                        </button>
+                    </div>
+
+                    <textarea id="output_area" readonly class="w-full flex-grow bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm font-sans focus:outline-none resize-none min-h-[520px]" placeholder="Kết quả sẽ tự động hiển thị tại đây khi bạn nhập dữ liệu bên trái..."></textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Logic chèn thẻ vào vị trí con trỏ chuột
+        function insertToken(token) {
+            const txtarea = document.getElementById('template_area');
+            const scrollPos = txtarea.scrollTop;
+            let strPos = txtarea.selectionStart;
+            const front = (txtarea.value).substring(0, strPos);
+            const back = (txtarea.value).substring(strPos, txtarea.value.length);
+            
+            txtarea.value = front + token + back;
+            strPos = strPos + token.length;
+            txtarea.selectionStart = strPos;
+            txtarea.selectionEnd = strPos;
+            txtarea.focus();
+            txtarea.scrollTop = scrollPos;
+            processData();
+        }
+
+        // 2. Hàm xóa nhanh dữ liệu từng ô/bảng
+        function clearField(id) {
+            document.getElementById(id).value = '';
+            processData();
+        }
+
+        // 3. Tải khuôn mẫu ví dụ
+        function loadSampleTemplate() {
+            document.getElementById('template_area').value = `Địa chỉ chịu trách nhiệm hàng hóa: Công ty Honda Việt Nam Phúc Thắng, Phúc Yên, Vĩnh Phúc.\n\nĐược sự cho phép của công ty Honda Nhật Bản\n\nZIN ZIN MOTOR CAM KẾT HÀNG CHÍNH HÃNG 100%\n\nHÀNG LUÔN CÓ SẴN, ĐẶT HÀNG GIAO NGAY\n\n✅ Thông Tin Vận Chuyển:\n- Giao hàng COD toàn quốc có thể kiểm hàng\n\n✅ Thông Tin Chi Tiết Sản Phẩm:\n- Tên sản phẩm: [the_ten_san_pham]\n- Mã sản phẩm: \n[the_ma_san_pham]\n- Thương hiệu: Honda\n- Xuất xứ: Việt Nam\n- Trạng thái: Mới 100%\n- Đời xe: [the_doi_xe]\n- Đơn vị: 1 Cái\n\n#zzm #zinzinmotor`;
+            processData();
+        }
+
+        // 4. BIẾN ĐỔI DỮ LIỆU THÔ THÀNH BẢNG LƯỚI GOOGLE SHEETS TRỰC QUAN
+        function renderSheetTable(rawText) {
+            const container = document.getElementById('sheet_table_view');
+            if (!rawText.trim()) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+
+            const lines = rawText.split('\n');
+            let maxCols = 0;
+            const rows = [];
+
+            lines.forEach(line => {
+                if (line.trim() === '') return;
+                const cols = line.split('\t').map(c => c.trim());
+                if (cols.length > maxCols) maxCols = cols.length;
+                rows.push(cols);
+            });
+
+            if (rows.length === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+
+            // Dựng bảng HTML theo cấu trúc bảng tính Excel/Sheets
+            let html = '<div class="overflow-x-auto max-h-64 border border-slate-200 rounded-lg bg-white shadow-xs">';
+            html += '<table class="w-full text-xs text-left border-collapse border-spacing-0 table-fixed min-w-[400px]">';
+            
+            // Header cột (A, B, C...)
+            html += '<thead class="bg-slate-100 sticky top-0 font-medium text-slate-500 z-10 border-b border-slate-200">';
+            html += '<tr><th class="w-10 p-1 border-r border-slate-200 bg-slate-200/80 text-center select-none"></th>';
+            for (let i = 0; i < maxCols; i++) {
+                html += `<th class="p-1 border-r border-slate-200 text-center bg-slate-100">${String.fromCharCode(65 + i)}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Dữ liệu hàng (1, 2, 3...)
+            rows.forEach((row, rowIndex) => {
+                html += '<tr class="hover:bg-slate-50/80 border-b border-slate-100">';
+                html += `<td class="p-1 bg-slate-100/70 text-slate-400 border-r border-slate-200 text-center font-medium select-none">${rowIndex + 1}</td>`;
+                for (let i = 0; i < maxCols; i++) {
+                    const cellValue = row[i] || '';
+                    // Nếu ô trống (bị merge từ sheet), tô màu nhạt và nghiêng text để nhận diện
+                    const cellStyle = cellValue === '' ? 'bg-slate-50/50 text-slate-300 italic font-sans' : 'font-mono text-slate-800';
+                    html += `<td class="p-1.5 border-r border-slate-200 truncate ${cellStyle}" title="${cellValue}">${cellValue || '(Ô trống)'}</td>`;
+                }
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // 5. Logic xử lý dữ liệu từ Google Sheets để trích xuất mã sản phẩm
+        function parseSheetsData(rawText) {
+            if (!rawText.trim()) return "";
+            const lines = rawText.split('\n');
+            let currentGroup = "";
+            let dataStructure = {};
+
+            lines.forEach(line => {
+                if (line.trim() === '') return;
+                const columns = line.split('\t').map(col => col.trim());
+                if (columns.length >= 3) {
+                    let group = columns[0];
+                    let position = columns[1];
+                    let code = columns[2];
+                    if (!group) group = currentGroup;
+                    else currentGroup = group;
+                    if (!dataStructure[group]) dataStructure[group] = [];
+                    
+                    // CHỈNH SỬA SỬA LỖI TẠI ĐÂY: Kiểm tra nếu tồn tại vị trí thực tế mới thêm dấu ": "
+                    if (position) {
+                        dataStructure[group].push(`${position}: ${code}`);
+                    } else {
+                        dataStructure[group].push(code);
+                    }
+                } else if (columns.length === 2) {
+                    let component = columns[0];
+                    let code = columns[1];
+                    if (!dataStructure[component]) dataStructure[component] = [];
+                    dataStructure[component].push(code);
+                }
+            });
+
+            let formattedLines = [];
+            for (let key in dataStructure) {
+                if (dataStructure[key].length > 1 && dataStructure[key][0].includes(':')) {
+                    formattedLines.push(`${key}: ${dataStructure[key].join(' / ')}`);
+                } else {
+                    formattedLines.push(`${key}: ${dataStructure[key].join(', ')}`);
+                }
+            }
+            return formattedLines.join('\n');
+        }
+
+        // 6. Hàm xử lý chuẩn hóa dòng trống thừa từ Shopee
+        function normalizeNewlines(text) {
+            let cleaned = text.replace(/\r\n/g, '\n');
+            cleaned = cleaned.replace(/([^\n])\n\n([^\n])/g, '$1\n$2');
+            return cleaned;
+        }
+
+        // 7. Hàm tổng hợp xử lý và đồng bộ real-time
+        function processData() {
+            const tenSp = document.getElementById('input_ten').value || '...';
+            const doiXe = document.getElementById('input_doi').value || '...';
+            const rawMa = document.getElementById('input_ma_raw').value;
+            
+            // Cập nhật giao diện bảng lưới Google Sheets trực quan
+            renderSheetTable(rawMa);
+            
+            const processedMa = parseSheetsData(rawMa);
+            let template = document.getElementById('template_area').value;
+            const isFixSpacingActive = document.getElementById('chk_fix_spacing').checked;
+
+            if (isFixSpacingActive) {
+                template = normalizeNewlines(template);
+            }
+            
+            let finalOutput = template
+                .replace(/\[the_ten_san_pham\]/g, tenSp)
+                .replace(/\[the_doi_xe\]/g, doiXe)
+                .replace(/\[the_ma_san_pham\]/g, processedMa);
+                
+            document.getElementById('output_area').value = finalOutput;
+        }
+
+        // 8. Sao chép kết quả vào bộ nhớ tạm
+        function copyToClipboard() {
+            const outputArea = document.getElementById('output_area');
+            outputArea.select();
+            outputArea.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(outputArea.value);
+            alert('Đã sao chép toàn bộ mô tả mới vào Clipboard!');
+        }
+
+        // Lắng nghe sự kiện để xử lý dữ liệu tức thì
+        document.getElementById('input_ten').addEventListener('input', processData);
+        document.getElementById('input_doi').addEventListener('input', processData);
+        document.getElementById('input_ma_raw').addEventListener('input', processData);
+        document.getElementById('template_area').addEventListener('input', processData);
+    </script>
+</body>
+</html>
