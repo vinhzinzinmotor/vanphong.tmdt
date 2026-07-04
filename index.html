@@ -72,6 +72,7 @@
                                 <div class="relative w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-600"></div>
                                 <span class="ms-2 select-none">Tự sửa lỗi giãn dòng Shopee</span>
                             </label>
+                            <button id="btn_save_template" onclick="saveTemplate()" class="text-xs text-emerald-600 hover:underline cursor-pointer font-medium flex items-center gap-0.5">💾 Lưu khuôn mẫu</button>
                             <button onclick="loadSampleTemplate()" class="text-xs text-blue-600 hover:underline cursor-pointer font-medium">Tải khuôn mẫu ví dụ</button>
                         </div>
                     </div>
@@ -83,13 +84,19 @@
             <div class="flex flex-col h-full">
                 <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 flex flex-col flex-grow space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <h2 class="text-lg font-semibold text-slate-900">3. Kết Quả Xem Trước & Copy</h2>
-                        <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-1 shadow-sm cursor-pointer">
-                            📋 Sao chép toàn bộ mô tả
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-semibold text-slate-900">3. Kết Quả Xem Trước & Copy</h2>
+                            <span id="char_count" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono">0 / 3000 ký tự</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="copy_toast" class="text-xs text-green-600 font-semibold opacity-0 transition-opacity duration-300 select-none">✓ Đã copy thành công</span>
+                            <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-1 shadow-sm cursor-pointer">
+                                📋 Sao chép toàn bộ mô tả
+                            </button>
+                        </div>
                     </div>
 
-                    <textarea id="output_area" readonly class="w-full flex-grow bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm font-sans focus:outline-none resize-none min-h-[520px]" placeholder="Kết quả sẽ tự động hiển thị tại đây khi bạn nhập dữ liệu bên trái..."></textarea>
+                    <textarea id="output_area" readonly class="w-full flex-grow bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm font-sans focus:outline-none resize-none min-h-[520px] transition-all duration-200" placeholder="Kết quả sẽ tự động hiển thị tại đây khi bạn nhập dữ liệu bên trái..."></textarea>
                 </div>
             </div>
 
@@ -126,6 +133,23 @@
             processData();
         }
 
+        // ĐOẠN THÊM MỚI: Hàm lưu template thô vào localStorage
+        function saveTemplate() {
+            const templateValue = document.getElementById('template_area').value;
+            localStorage.setItem('zzm_saved_template', templateValue);
+            
+            // Hiệu ứng đổi chữ trên nút để báo phản hồi thành công
+            const btnSave = document.getElementById('btn_save_template');
+            const oldText = btnSave.innerHTML;
+            btnSave.innerHTML = "✓ Đã lưu!";
+            btnSave.classList.replace('text-emerald-600', 'text-green-700');
+            
+            setTimeout(() => {
+                btnSave.innerHTML = oldText;
+                btnSave.classList.replace('text-green-700', 'text-emerald-600');
+            }, 1500);
+        }
+
         // 4. BIẾN ĐỔI DỮ LIỆU THÔ THÀNH BẢNG LƯỚI GOOGLE SHEETS TRỰC QUAN
         function renderSheetTable(rawText) {
             const container = document.getElementById('sheet_table_view');
@@ -153,11 +177,9 @@
                 return;
             }
 
-            // Dựng bảng HTML theo cấu trúc bảng tính Excel/Sheets
             let html = '<div class="overflow-x-auto max-h-64 border border-slate-200 rounded-lg bg-white shadow-xs">';
             html += '<table class="w-full text-xs text-left border-collapse border-spacing-0 table-fixed min-w-[400px]">';
             
-            // Header cột (A, B, C...)
             html += '<thead class="bg-slate-100 sticky top-0 font-medium text-slate-500 z-10 border-b border-slate-200">';
             html += '<tr><th class="w-10 p-1 border-r border-slate-200 bg-slate-200/80 text-center select-none"></th>';
             for (let i = 0; i < maxCols; i++) {
@@ -165,13 +187,11 @@
             }
             html += '</tr></thead><tbody>';
 
-            // Dữ liệu hàng (1, 2, 3...)
             rows.forEach((row, rowIndex) => {
                 html += '<tr class="hover:bg-slate-50/80 border-b border-slate-100">';
                 html += `<td class="p-1 bg-slate-100/70 text-slate-400 border-r border-slate-200 text-center font-medium select-none">${rowIndex + 1}</td>`;
                 for (let i = 0; i < maxCols; i++) {
                     const cellValue = row[i] || '';
-                    // Nếu ô trống (bị merge từ sheet), tô màu nhạt và nghiêng text để nhận diện
                     const cellStyle = cellValue === '' ? 'bg-slate-50/50 text-slate-300 italic font-sans' : 'font-mono text-slate-800';
                     html += `<td class="p-1.5 border-r border-slate-200 truncate ${cellStyle}" title="${cellValue}">${cellValue || '(Ô trống)'}</td>`;
                 }
@@ -200,7 +220,6 @@
                     else currentGroup = group;
                     if (!dataStructure[group]) dataStructure[group] = [];
                     
-                    // CHỈNH SỬA SỬA LỖI TẠI ĐÂY: Kiểm tra nếu tồn tại vị trí thực tế mới thêm dấu ": "
                     if (position) {
                         dataStructure[group].push(`${position}: ${code}`);
                     } else {
@@ -238,7 +257,6 @@
             const doiXe = document.getElementById('input_doi').value || '...';
             const rawMa = document.getElementById('input_ma_raw').value;
             
-            // Cập nhật giao diện bảng lưới Google Sheets trực quan
             renderSheetTable(rawMa);
             
             const processedMa = parseSheetsData(rawMa);
@@ -255,15 +273,49 @@
                 .replace(/\[the_ma_san_pham\]/g, processedMa);
                 
             document.getElementById('output_area').value = finalOutput;
+
+            // --- Xử lý đếm ký tự và bật bộ cảnh báo màu đỏ ---
+            const totalChars = finalOutput.length;
+            const charCountBadge = document.getElementById('char_count');
+            const outputTextArea = document.getElementById('output_area');
+
+            if (totalChars > 3000) {
+                charCountBadge.innerText = `${totalChars} / 3000 ký tự (Vượt quá giới hạn Shopee!)`;
+                charCountBadge.className = "text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-mono font-bold animate-pulse";
+                
+                outputTextArea.classList.remove('bg-slate-50', 'border-slate-200', 'focus:ring-blue-500');
+                outputTextArea.classList.add('bg-rose-50/30', 'border-rose-500', 'ring-2', 'ring-rose-200');
+            } else {
+                charCountBadge.innerText = `${totalChars} / 3000 ký tự`;
+                charCountBadge.className = "text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono";
+                
+                outputTextArea.classList.remove('bg-rose-50/30', 'border-rose-500', 'ring-2', 'ring-rose-200');
+                outputTextArea.classList.add('bg-slate-50', 'border-slate-200');
+            }
         }
 
-        // 8. Sao chép kết quả vào bộ nhớ tạm
+        // 8. ĐOẠN ĐƯỢC CHỈNH SỬA: Sao chép kết quả (Bỏ hiệu ứng bôi đen thừa, thay bằng nhấp nháy toàn hộp văn bản)
         function copyToClipboard() {
             const outputArea = document.getElementById('output_area');
-            outputArea.select();
-            outputArea.setSelectionRange(0, 99999);
+            
+            // Sao chép ngầm không bôi đen hiển thị
             navigator.clipboard.writeText(outputArea.value);
-            alert('Đã sao chép toàn bộ mô tả mới vào Clipboard!');
+            
+            // Tạo hiệu ứng nhấp nháy chớp mắt một cái để báo hiệu trực quan
+            outputArea.classList.add('opacity-40');
+            setTimeout(() => {
+                outputArea.classList.remove('opacity-40');
+            }, 150);
+            
+            // Hiển thị dòng trạng thái Toast thông báo
+            const toast = document.getElementById('copy_toast');
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2000);
         }
 
         // Lắng nghe sự kiện để xử lý dữ liệu tức thì
@@ -271,6 +323,15 @@
         document.getElementById('input_doi').addEventListener('input', processData);
         document.getElementById('input_ma_raw').addEventListener('input', processData);
         document.getElementById('template_area').addEventListener('input', processData);
+
+        // ĐOẠN THÊM MỚI: Tự động khôi phục khuôn mẫu cũ từ bộ nhớ khi tải lại trang (F5)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('zzm_saved_template');
+            if (savedData !== null) {
+                document.getElementById('template_area').value = savedData;
+            }
+            processData(); // Chạy xử lý đồng bộ dữ liệu ngay khi vừa lên trang
+        });
     </script>
 </body>
 </html>
